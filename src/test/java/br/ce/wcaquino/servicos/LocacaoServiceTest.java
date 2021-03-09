@@ -14,7 +14,11 @@ import java.util.Date;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.Is;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -35,11 +39,38 @@ public class LocacaoServiceTest {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
+	private LocacaoService locacaoService;
+
+	// Deixado estatico pois o JUnit reinicializa todas as variaveis a cada teste
+	private static int contadorDeTestes = 0;
+
+	@Before
+	public void inicializarCenarios() {
+		System.out.println("Before");
+		locacaoService = new LocacaoService();
+		contadorDeTestes++;
+		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
+
+	}
+
+	@After
+	public void depoisDoTeste() {
+		System.out.println("After");
+	}
+
+	@BeforeClass
+	public static void antesDeInstanciarClasses() {
+		System.out.println("antesDeInstanciarClasses");
+	}
+
+	@AfterClass
+	public static void depoisDaClasseSerDestruida() {
+		System.out.println("depoisDaClasseSerDestruida");
+	}
+
 	@Test
 	public void testeLocacao() throws Exception {
 		// Cenario
-		LocacaoService locacaoService = new LocacaoService();
-		System.out.println("DSADAS");
 		Usuario usuario = new Usuario();
 		usuario.setNome("Rodrigo");
 
@@ -51,9 +82,10 @@ public class LocacaoServiceTest {
 		// Ação
 		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
 
-		// Passamos a utilizar o ErrorCollector para retornar todas as falhas de uma vez
-		// só
-		// Nao bloqueando as proximas verificações se uma anterior falhar
+		/*
+		 * Passamos a utilizar o ErrorCollector para retornar todas as falhas de uma vez
+		 * só Nao bloqueando as proximas verificações se uma anterior falhar
+		 */
 		error.checkThat(locacao.getValor(), is(equalTo(5.0)));
 		error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
 		error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
@@ -76,11 +108,13 @@ public class LocacaoServiceTest {
 		 */
 	}
 
-	// Testes para tratamento de exceptions
-	@Test(expected = FilmeSemEstoqueException.class) // Forma elegante - Teste espera uma exception
+	/*
+	 * Testes para tratamento de exceptions Forma elegante - Teste espera uma
+	 * exception , quando apenas a exceção importa para o teste, mas se precisar da
+	 * mensagem nao se encaixa
+	 */
+	@Test(expected = FilmeSemEstoqueException.class)
 	public void testeLocacaFilmeSemEstoque() throws Exception {
-		// Cenario
-		LocacaoService locacaoService = new LocacaoService();
 		Usuario usuario = new Usuario();
 		usuario.setNome("Rodrigo");
 
@@ -93,11 +127,10 @@ public class LocacaoServiceTest {
 		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
 	}
 
-	//Forma elegante - se ficar na duvida qual usar, utiliza a forma elegante
+	// Forma robusta - se ficar na duvida qual usar, utiliza a forma robusta
 	@Test
 	public void testeLocacaoUsuarioVazio() throws FilmeSemEstoqueException {
 		// Cenario
-		LocacaoService locacaoService = new LocacaoService();
 		Filme f = new Filme("Rodrigo FIlm", 1, 4.0);
 
 		// acao
@@ -108,22 +141,22 @@ public class LocacaoServiceTest {
 			assertThat(e.getMessage(), is("Usuário vazio"));
 		}
 
-		//Continua na forma robusta, essa mensagem vai ser exibida, diferente da forma robusta, abaixo
-		System.out.println("Continua o codigo - forma elegante");
+		// Continua na forma robusta, essa mensagem vai ser exibida, diferente da forma
+		// nova , abaixo
+		System.out.println("Continua o codigo - forma robusta");
 	}
 
-	//Forma nova
+	// Forma nova
 	@Test
 	public void testeLocacaoFilmeVazio() throws FilmeSemEstoqueException, LocadoraException {
 		// Cenario
-		LocacaoService locacaoService = new LocacaoService();
 		Usuario usuario = new Usuario("Rodrigo");
 
 		expectedException.expect(LocadoraException.class);
 		expectedException.expectMessage("Filme vazio");
 		locacaoService.alugarFilme(usuario, null);
-		
-		//Aqui nao continua
+
+		// Aqui não continua
 		System.out.println("Continua o codigo - Forma nova");
 
 	}
