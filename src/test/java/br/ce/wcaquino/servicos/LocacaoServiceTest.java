@@ -10,7 +10,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.Is;
@@ -80,7 +83,7 @@ public class LocacaoServiceTest {
 		filme.setEstoque(3);
 
 		// Ação
-		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
+		Locacao locacao = locacaoService.alugarFilme(usuario, Arrays.asList(filme));
 
 		/*
 		 * Passamos a utilizar o ErrorCollector para retornar todas as falhas de uma vez
@@ -123,8 +126,10 @@ public class LocacaoServiceTest {
 		filme.setPrecoLocacao(5.0);
 		filme.setEstoque(0);
 
+		
+		
 		// Ação
-		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
+		Locacao locacao = locacaoService.alugarFilme(usuario, Arrays.asList(filme));
 	}
 
 	// Forma robusta - se ficar na duvida qual usar, utiliza a forma robusta
@@ -132,10 +137,9 @@ public class LocacaoServiceTest {
 	public void testeLocacaoUsuarioVazio() throws FilmeSemEstoqueException {
 		// Cenario
 		Filme f = new Filme("Rodrigo FIlm", 1, 4.0);
-
 		// acao
 		try {
-			locacaoService.alugarFilme(null, f);
+			locacaoService.alugarFilme(null, Arrays.asList(f));
 			fail();
 		} catch (LocadoraException e) {
 			assertThat(e.getMessage(), is("Usuário vazio"));
@@ -153,7 +157,7 @@ public class LocacaoServiceTest {
 		Usuario usuario = new Usuario("Rodrigo");
 
 		expectedException.expect(LocadoraException.class);
-		expectedException.expectMessage("Filme vazio");
+		expectedException.expectMessage("Sem filmes");
 		locacaoService.alugarFilme(usuario, null);
 
 		// Aqui não continua
