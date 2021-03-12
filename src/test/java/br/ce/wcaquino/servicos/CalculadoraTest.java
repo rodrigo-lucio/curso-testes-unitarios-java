@@ -56,7 +56,7 @@ public class CalculadoraTest {
 		//Cenário
 		int a = 6;
 		int b = 0;
-		//Ação
+		//Açãod
 		int resultado = calc.dividir(a, b);
 		//Verificação
 		assertEquals(2, resultado);	

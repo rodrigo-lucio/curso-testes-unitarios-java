@@ -28,11 +28,28 @@ public class LocacaoService {
 
 		double valorLocacao = 0;
 
-		for (Filme f : filmes) {
-			if (f.getEstoque() == 0) {
+		for (int i = 0; i < filmes.size(); i++) {
+			if (filmes.get(i).getEstoque() == 0) {
 				throw new FilmeSemEstoqueException();
 			}
-			valorLocacao += f.getPrecoLocacao();
+
+			Double precoLocacaoFilme = filmes.get(i).getPrecoLocacao();
+
+			switch (i) {
+			case 2:
+				precoLocacaoFilme = (precoLocacaoFilme * 0.75);
+				break;
+			case 3:
+				precoLocacaoFilme = (precoLocacaoFilme * 0.5);
+				break;
+			case 4:
+				precoLocacaoFilme = (precoLocacaoFilme * 0.25);
+				break;
+			case 5:
+				precoLocacaoFilme = 0d;
+				break;
+			}
+			valorLocacao += precoLocacaoFilme;
 		}
 
 		locacao.setFilme(filmes);
