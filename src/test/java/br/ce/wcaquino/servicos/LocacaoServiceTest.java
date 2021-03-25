@@ -101,9 +101,16 @@ public class LocacaoServiceTest {
 		 * só Nao bloqueando as proximas verificações se uma anterior falhar
 		 */
 		error.checkThat(locacao.getValor(), is(equalTo(5.0)));
-		error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
-		error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
 
+		//error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
+		//trocado a chamada acima pela de baixo porem agora com machers
+		error.checkThat(locacao.getDataLocacao(), isHoje());
+		
+		
+		//error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
+		//trocado a chamada acima pela de baixo porem agora com machers
+		error.checkThat(locacao.getDataRetorno(), isHojeComDiferencaDias(1));
+		
 		// Verificação
 		/*
 		 * assertTrue(isMesmaData(locacao.getDataLocacao(), new Date()));
