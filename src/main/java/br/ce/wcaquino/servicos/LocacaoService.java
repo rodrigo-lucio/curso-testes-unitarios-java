@@ -54,7 +54,7 @@ public class LocacaoService {
 			valorLocacao += precoLocacaoFilme;
 		}
 
-		locacao.setFilme(filmes);
+		locacao.setFilmes(filmes);
 		locacao.setValor(valorLocacao);
 		locacao.setUsuario(usuario);
 		locacao.setDataLocacao(new Date());
