@@ -37,6 +37,8 @@ import org.junit.rules.ExpectedException;
 
 import br.ce.wcaquino.builder.FilmeBuilder;
 import br.ce.wcaquino.builder.UsuarioBuilder;
+import br.ce.wcaquino.dao.LocacaoDao;
+import br.ce.wcaquino.dao.LocacaoDaoFake;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -64,6 +66,8 @@ public class LocacaoServiceTest {
 	public void inicializarCenarios() {
 		System.out.println("Before");
 		locacaoService = new LocacaoService();
+		LocacaoDao dao = new LocacaoDaoFake();
+		locacaoService.setLocacaoDao(dao);
 		contadorDeTestes++;
 		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
 
