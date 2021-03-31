@@ -1,4 +1,4 @@
-package br.ce.wcaquino.servicos;
+ package br.ce.wcaquino.servicos;
 
 import static br.ce.wcaquino.builder.FilmeBuilder.umFilme;
 import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;
@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mockito;
 
 import br.ce.wcaquino.dao.LocacaoDao;
 import br.ce.wcaquino.dao.LocacaoDaoFake;
@@ -42,7 +43,7 @@ public class CalculoValorLocacaoTest {
 	@Before
 	public void setup() {
 		locacaoService = new LocacaoService();
-		LocacaoDao dao = new LocacaoDaoFake();
+		LocacaoDao dao = Mockito.mock(LocacaoDao.class);
 		locacaoService.setLocacaoDao(dao);
 	}
 

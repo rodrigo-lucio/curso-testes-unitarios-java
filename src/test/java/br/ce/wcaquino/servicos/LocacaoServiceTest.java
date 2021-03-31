@@ -34,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
 import br.ce.wcaquino.builder.FilmeBuilder;
 import br.ce.wcaquino.builder.UsuarioBuilder;
@@ -66,7 +67,7 @@ public class LocacaoServiceTest {
 	public void inicializarCenarios() {
 		System.out.println("Before");
 		locacaoService = new LocacaoService();
-		LocacaoDao dao = new LocacaoDaoFake();
+		LocacaoDao dao = new Mockito().mock(LocacaoDao.class);
 		locacaoService.setLocacaoDao(dao);
 		contadorDeTestes++;
 		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
