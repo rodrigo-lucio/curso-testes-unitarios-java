@@ -62,15 +62,20 @@ public class LocacaoServiceTest {
 
 	// Deixado estatico pois o JUnit reinicializa todas as variaveis a cada teste
 	private static int contadorDeTestes = 0;
+	
+	private LocacaoDao dao;
+	private SPCService spc;
 
 	@Before
 	public void inicializarCenarios() {
 		System.out.println("Before");
 		locacaoService = new LocacaoService();
-		LocacaoDao dao = new Mockito().mock(LocacaoDao.class);
+		dao = new Mockito().mock(LocacaoDao.class);
 		locacaoService.setLocacaoDao(dao);
 		contadorDeTestes++;
 		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
+		spc = Mockito.mock(SPCService.class);
+		locacaoService.setSPCService(spc);
 
 	}
 
@@ -91,13 +96,13 @@ public class LocacaoServiceTest {
 
 	@Test
 	public void deveAlugarFilme() throws Exception {
-		
-		//Executa o teste só quando não é sabado
+
+		// Executa o teste só quando não é sabado
 		Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
-		
+
 		// Cenario
 		Usuario usuario = umUsuario().agora();
-		
+
 		Filme filme = umFilme().comValorLocacao(5.0).agora();
 
 		// Ação
@@ -109,15 +114,15 @@ public class LocacaoServiceTest {
 		 */
 		error.checkThat(locacao.getValor(), is(equalTo(5.0)));
 
-		//error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
-		//trocado a chamada acima pela de baixo porem agora com machers
+		// error.checkThat(isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
+		// trocado a chamada acima pela de baixo porem agora com machers
 		error.checkThat(locacao.getDataLocacao(), isHoje());
-		
-		
-		//error.checkThat(isMesmaData(locacao.getDataRetorno(), obterDataComDiferencaDias(1)), is(true));
-		//trocado a chamada acima pela de baixo porem agora com machers
+
+		// error.checkThat(isMesmaData(locacao.getDataRetorno(),
+		// obterDataComDiferencaDias(1)), is(true));
+		// trocado a chamada acima pela de baixo porem agora com machers
 		error.checkThat(locacao.getDataRetorno(), isHojeComDiferencaDias(1));
-		
+
 		// Verificação
 		/*
 		 * assertTrue(isMesmaData(locacao.getDataLocacao(), new Date()));
@@ -144,11 +149,11 @@ public class LocacaoServiceTest {
 	@Test(expected = FilmeSemEstoqueException.class)
 	public void deveLancarExcecaoAoAlugarFilmeSemEstoque() throws Exception {
 		Usuario usuario = umUsuario().agora();
-		
-		//Filme filme = umFilme().semEstoque().agora(); - tambem poderia ser assim, mas criamos um especifico que esta abaixo
-		Filme filme = umFilmeSemEstoque().agora(); 
-		
-		
+
+		// Filme filme = umFilme().semEstoque().agora(); - tambem poderia ser assim, mas
+		// criamos um especifico que esta abaixo
+		Filme filme = umFilmeSemEstoque().agora();
+
 		// Ação
 		Locacao locacao = locacaoService.alugarFilme(usuario, Arrays.asList(filme));
 	}
@@ -252,25 +257,36 @@ public class LocacaoServiceTest {
 
 	}
 
-	@Test 
+	@Test
 	public void deveDevolverNaSegundaAoAlugarNoSabado() throws FilmeSemEstoqueException, LocadoraException {
-		//Só executa o teste no sabado
+		// Só executa o teste no sabado
 		Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
-		
+
 		Usuario usuario = umUsuario().agora();
 		List<Filme> filmes = new ArrayList<Filme>();
 		filmes.add(umFilme().agora());
 		Locacao retorno = locacaoService.alugarFilme(usuario, filmes);
-		
+
 		boolean isSegunda = DataUtils.verificarDiaSemana(retorno.getDataRetorno(), Calendar.MONDAY);
 		assertTrue(isSegunda);
-		
+
 		assertThat(retorno.getDataRetorno(), caiEm(Calendar.MONDAY));
 		assertThat(retorno.getDataRetorno(), caiNumaSegunda());
-	
+
 	}
-	
-	public static void main(String[] args) {
-		new BuilderMaster().gerarCodigoClasse(Locacao.class);
+
+	@Test
+	public void naoDeveAlugarFilmeParaUsuarioNegativadoSPC() throws FilmeSemEstoqueException, LocadoraException {
+		Usuario usuario = umUsuario().agora();
+		List<Filme> filmes = Arrays.asList(umFilme().agora());
+		
+		//Quando possuiNegativacao for chamado, retorne true
+		Mockito.when(spc.possuiNegativacao(usuario)).thenReturn(true);
+		expectedException.expect(LocadoraException.class);
+		expectedException.expectMessage("Usuario negativado no SPC");
+
+		locacaoService.alugarFilme(usuario, filmes);
+
 	}
+ 
 }
