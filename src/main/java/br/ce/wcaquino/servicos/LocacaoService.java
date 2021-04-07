@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import br.ce.wcaquino.dao.LocacaoDao;
-import br.ce.wcaquino.dao.LocacaoDaoFake;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -20,6 +19,7 @@ public class LocacaoService {
 
 	private LocacaoDao dao;
 	private SPCService spcService;
+	private EmailService emailService;
 	
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmeSemEstoqueException, LocadoraException {
 
@@ -85,12 +85,23 @@ public class LocacaoService {
 		return locacao;
 	}
 	
+	public void notificarAtrasos() {
+		List<Locacao> locacoes = dao.obterLocacoesPendentes();
+		for(Locacao locacao : locacoes) {
+			emailService.notificarAtraso(locacao.getUsuario());
+		}
+	}
+	
 	public void setLocacaoDao(LocacaoDao dao) {
 		this.dao = dao;
 	}
 	
 	public void setSPCService(SPCService service) {
 		this.spcService = service;
+	}
+	
+	public void setEmailService(EmailService emailService) {
+		this.emailService = emailService;
 	}
 
 }

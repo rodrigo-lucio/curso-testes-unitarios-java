@@ -2,6 +2,7 @@ package br.ce.wcaquino.entidades;
 
 public class Usuario {
 
+
 	private String nome;
 	
 	public Usuario() {}
@@ -42,6 +43,10 @@ public class Usuario {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Usuario [nome=" + nome + "]";
+	}
 	
 }

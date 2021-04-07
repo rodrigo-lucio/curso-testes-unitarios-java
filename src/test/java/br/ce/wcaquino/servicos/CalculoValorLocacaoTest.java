@@ -5,7 +5,6 @@ import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +18,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
 
 import br.ce.wcaquino.dao.LocacaoDao;
-import br.ce.wcaquino.dao.LocacaoDaoFake;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
