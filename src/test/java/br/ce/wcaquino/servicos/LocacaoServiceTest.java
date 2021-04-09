@@ -8,7 +8,6 @@ import static br.ce.wcaquino.matchers.MatchersProprios.caiEm;
 import static br.ce.wcaquino.matchers.MatchersProprios.caiNumaSegunda;
 import static br.ce.wcaquino.matchers.MatchersProprios.isHoje;
 import static br.ce.wcaquino.matchers.MatchersProprios.isHojeComDiferencaDias;
-import static br.ce.wcaquino.utils.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -31,10 +30,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import br.ce.wcaquino.builder.LocacaoBuilder;
 import br.ce.wcaquino.dao.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;

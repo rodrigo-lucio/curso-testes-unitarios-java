@@ -1,14 +1,11 @@
 package br.ce.wcaquino.matchers;
 
-import static org.junit.Assert.*;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Test;
 
 import br.ce.wcaquino.utils.DataUtils;
 

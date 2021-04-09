@@ -4,10 +4,7 @@ import static br.ce.wcaquino.utils.DataUtils.adicionarDias;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-
-import org.mockito.cglib.core.Local;
 
 import br.ce.wcaquino.dao.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
