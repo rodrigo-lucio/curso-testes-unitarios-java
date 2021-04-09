@@ -2,11 +2,11 @@ package br.ce.wcaquino.entidades;
 
 public class Usuario {
 
-
 	private String nome;
-	
-	public Usuario() {}
-	
+
+	public Usuario() {
+	}
+
 	public Usuario(String nome) {
 		this.nome = nome;
 	}
@@ -48,5 +48,5 @@ public class Usuario {
 	public String toString() {
 		return "Usuario [nome=" + nome + "]";
 	}
-	
+
 }

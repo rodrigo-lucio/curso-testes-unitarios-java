@@ -1,4 +1,4 @@
- package br.ce.wcaquino.servicos;
+package br.ce.wcaquino.servicos;
 
 import static br.ce.wcaquino.builder.FilmeBuilder.umFilme;
 import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;

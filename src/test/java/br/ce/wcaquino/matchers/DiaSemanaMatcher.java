@@ -12,14 +12,14 @@ import org.junit.Test;
 
 import br.ce.wcaquino.utils.DataUtils;
 
-public class DiaSemanaMatcher extends TypeSafeMatcher<Date> { //Date é o o tipo do parametro que é passado la no assert
+public class DiaSemanaMatcher extends TypeSafeMatcher<Date> { // Date é o o tipo do parametro que é passado la no assert
 
 	private Integer diaSemana;
-		
+
 	public DiaSemanaMatcher(Integer diaSemana) {
 		this.diaSemana = diaSemana;
 	}
-	
+
 	public void describeTo(Description description) {
 		Calendar data = Calendar.getInstance();
 		data.set(Calendar.DAY_OF_WEEK, diaSemana);

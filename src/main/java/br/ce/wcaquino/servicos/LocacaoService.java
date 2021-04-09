@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.mockito.cglib.core.Local;
+
 import br.ce.wcaquino.dao.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
@@ -20,7 +22,7 @@ public class LocacaoService {
 	private LocacaoDao dao;
 	private SPCService spcService;
 	private EmailService emailService;
-	
+
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmeSemEstoqueException, LocadoraException {
 
 		if (usuario == null) {
@@ -58,8 +60,8 @@ public class LocacaoService {
 			}
 			valorLocacao += precoLocacaoFilme;
 		}
-		
-		if(spcService.possuiNegativacao(usuario)) {
+
+		if (spcService.possuiNegativacao(usuario)) {
 			throw new LocadoraException("Usuario negativado no SPC");
 		}
 
@@ -71,12 +73,12 @@ public class LocacaoService {
 		// Entrega no dia seguinte
 		Date dataEntrega = new Date();
 		dataEntrega = adicionarDias(dataEntrega, 1);
-		
-		//Nao aceita devolver no domingo
-		if(DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)){
+
+		// Nao aceita devolver no domingo
+		if (DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)) {
 			dataEntrega = adicionarDias(dataEntrega, 1);
 		}
-		
+
 		locacao.setDataRetorno(dataEntrega);
 
 		// Salvando a locacao...
@@ -84,22 +86,24 @@ public class LocacaoService {
 
 		return locacao;
 	}
-	
+
 	public void notificarAtrasos() {
 		List<Locacao> locacoes = dao.obterLocacoesPendentes();
-		for(Locacao locacao : locacoes) {
-			emailService.notificarAtraso(locacao.getUsuario());
+		for (Locacao locacao : locacoes) {
+			if(locacao.getDataRetorno().before(new Date())) {
+				emailService.notificarAtraso(locacao.getUsuario());				
+			}
 		}
 	}
-	
+
 	public void setLocacaoDao(LocacaoDao dao) {
 		this.dao = dao;
 	}
-	
+
 	public void setSPCService(SPCService service) {
 		this.spcService = service;
 	}
-	
+
 	public void setEmailService(EmailService emailService) {
 		this.emailService = emailService;
 	}

@@ -15,11 +15,11 @@ import br.ce.wcaquino.utils.DataUtils;
 public class DataDiferencaMatcher extends TypeSafeMatcher<Date> {
 
 	private Integer diferencaDias;
-		
+
 	public DataDiferencaMatcher(Integer diferencaDias) {
 		this.diferencaDias = diferencaDias;
 	}
-	
+
 	public void describeTo(Description description) {
 		Calendar data = Calendar.getInstance();
 		data.set(Calendar.DAY_OF_WEEK, diferencaDias);

@@ -9,60 +9,60 @@ import org.junit.Test;
 import br.ce.wcaquino.exception.NaoPodeDividirPor0Exception;
 
 public class CalculadoraTest {
-	
+
 	private Calculadora calc;
-	
+
 	@Before
 	public void iniciarVariaveis() {
-		calc = new Calculadora(); 
+		calc = new Calculadora();
 	}
-	
+
 	@Test
 	public void deveSomarDoisValores() {
-		//Cenário
+		// Cenário
 		int a = 5;
 		int b = 3;
-		//Ação
+		// Ação
 		int resultado = calc.somar(a, b);
-		//Verificação
+		// Verificação
 		assertEquals(8, resultado);
-		
+
 	}
-	
+
 	@Test
 	public void deveSubtrairDoisValores() {
-		//Cenário
+		// Cenário
 		int a = 5;
 		int b = 3;
-		//Ação
+		// Ação
 		int resultado = calc.subtrair(a, b);
-		//Verificação
-		assertEquals(2, resultado);	
+		// Verificação
+		assertEquals(2, resultado);
 	}
-	
+
 	@Test
 	public void deveDividirDoisValores() {
-		//Cenário
+		// Cenário
 		int a = 6;
 		int b = 3;
-		//Ação
+		// Ação
 		int resultado = calc.dividir(a, b);
-		//Verificação
-		assertEquals(2, resultado);	
+		// Verificação
+		assertEquals(2, resultado);
 	}
-	
+
 	@Test(expected = NaoPodeDividirPor0Exception.class)
-	public void deveLancarExcecaoAoDividirPor0() throws NaoPodeDividirPor0Exception{
-		//Cenário
+	public void deveLancarExcecaoAoDividirPor0() throws NaoPodeDividirPor0Exception {
+		// Cenário
 		int a = 6;
 		int b = 0;
-		//Açãod
+		// Açãod
 		int resultado = calc.dividir(a, b);
-		//Verificação
-		assertEquals(2, resultado);	
+		// Verificação
+		assertEquals(2, resultado);
 	}
-	
-	@Test 
+
+	@Test
 	public void deveDividir() {
 		String a = "6";
 		String b = "3";

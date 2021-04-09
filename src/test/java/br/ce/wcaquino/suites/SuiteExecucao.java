@@ -14,22 +14,18 @@ import br.ce.wcaquino.servicos.LocacaoServiceTest;
  * Executa todos os testes de uma vez só
  */
 @RunWith(Suite.class)
-@SuiteClasses({
-	CalculadoraTest.class,
-	CalculoValorLocacaoTest.class,
-	LocacaoServiceTest.class
-})
+@SuiteClasses({ CalculadoraTest.class, CalculoValorLocacaoTest.class, LocacaoServiceTest.class })
 public class SuiteExecucao {
-	
+
 	@BeforeClass
 	public static void before() {
-		//Executa tudo antes de toda a bateria
+		// Executa tudo antes de toda a bateria
 		System.out.println("before");
 	}
-	
+
 	@AfterClass
 	public static void after() {
-		//Executa tudo depois de toda a bateria
+		// Executa tudo depois de toda a bateria
 		System.out.println("after");
 	}
 }

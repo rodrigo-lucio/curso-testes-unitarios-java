@@ -13,14 +13,14 @@ public class Calculadora {
 	}
 
 	public int dividir(int a, int b) throws NaoPodeDividirPor0Exception {
-		
+
 		if (b == 0) {
 			throw new NaoPodeDividirPor0Exception();
 		}
-		
+
 		return a / b;
 	}
-	
+
 	public int divide(String a, String b) {
 		return Integer.valueOf(a) / Integer.valueOf(b);
 	}

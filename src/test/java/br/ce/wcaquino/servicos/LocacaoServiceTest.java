@@ -31,6 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import br.ce.wcaquino.builder.LocacaoBuilder;
@@ -271,14 +272,14 @@ public class LocacaoServiceTest {
 	}
 
 	@Test
-	public void naoDeveAlugarFilmeParaUsuarioNegativadoSPC() throws FilmeSemEstoqueException  {
+	public void naoDeveAlugarFilmeParaUsuarioNegativadoSPC() throws FilmeSemEstoqueException {
 		Usuario usuario = umUsuario().agora();
-		Usuario usuario2 = umUsuario().comNome("user 1").agora();
 		List<Filme> filmes = Arrays.asList(umFilme().agora());
 
-		// Quando possuiNegativacao for chamado para ta usuario, retorne true
+		// Quando possuiNegativacao for chamado para tal usuario, retorne true
+		// Esta linha altera o comportamento do mock, por padrao ele retorna false,
+		// nesse caso alteramos para true, ensinando isso pra ele
 		Mockito.when(spc.possuiNegativacao(usuario)).thenReturn(true);
-		
 
 		try {
 			locacaoService.alugarFilme(usuario, filmes);
@@ -287,20 +288,51 @@ public class LocacaoServiceTest {
 			Assert.assertThat(e.getMessage(), is("Usuario negativado no SPC"));
 		}
 
-		
+		// Verifica no mock spc, se o metodo possui negativação foi chamado para tal
+		// usuario
 		Mockito.verify(spc).possuiNegativacao(usuario);
 	}
 
 	@Test
 	public void deveEnviarEmailParaLocacoesAtrasadas() {
 		Usuario usuario = umUsuario().agora();
-		List<Locacao> locacoes = Arrays
-				.asList(umLocacao().comUsuario(usuario).comDataRetorno(obterDataComDiferencaDias(-2)).agora());
+		Usuario usuario2 = umUsuario().comNome("user 1").agora();
+		Usuario usuario3 = umUsuario().comNome("user 3").agora();
+		List<Locacao> locacoes = Arrays.asList(
+					umLocacao().atrasada().comUsuario(usuario).agora(),
+					umLocacao().comUsuario(usuario2).agora(),
+					umLocacao().atrasada().comUsuario(usuario3).agora(),
+					umLocacao().atrasada().comUsuario(usuario3).agora()
+					);
+
+		// Alterando o comportamento do mock, estamos ensinando ele
+		// Quando for chamado locacoes pendentes, retorne a lista de locacoes
 		Mockito.when(dao.obterLocacoesPendentes()).thenReturn(locacoes);
 
 		locacaoService.notificarAtrasos();
 
+		// Verifica no mock, se o metodo notificar atrasos foi chamado para esse usuario
 		Mockito.verify(email).notificarAtraso(usuario);
+		
+		Mockito.verify(email, Mockito.times(2)).notificarAtraso(usuario3); 
+		// == Times = diz que o método foi chamado exatamente duas vezes para o usuario
+		//Poderiamos utilizar Mockito.atLeast(2) = Se foi chamado pelo menos duas vezes
+		//Ou Mockito.atMost(5) = No maximo 5
+		
+		
+		//Verifica se o metodo nunca foi chamado para o usuario, que nesse caso a locacao dele nao esta atrasada, logo ele nao recebeu o email
+		Mockito.verify(email, Mockito.never()).notificarAtraso(usuario2);   
+		
+		//Garante que mais nenhum email foi enviado fora os que foram informados acima
+		Mockito.verifyNoMoreInteractions(email);
+		
+		//Caso queiramos garantir que o serviço de SPC não foi chamado nesse teste
+		//Mockito.verifyZeroInteractions(spc);
+		//Claro que fica comentado por não teria logica nesse teste, colocado aqui apenas para conhecimento
+		
+		//Aqui podemos verificar se o notificar atraso foi chamado pelo menos 3 vezes para qualquer usuario
+		Mockito.verify(email, Mockito.times(3)).notificarAtraso(Mockito.any(Usuario.class));
+		//No caso, foi chamado uma vez para usuario e duas vezes para usuario3
 	}
 
 }

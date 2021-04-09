@@ -18,30 +18,29 @@ public class AssertTest {
 	@Test
 	public void test() {
 		assertTrue(true);
-		
-		//Com margem de erro de 0.01
-		assertEquals(0.512, 0.513, 0.01);	
+
+		// Com margem de erro de 0.01
+		assertEquals(0.512, 0.513, 0.01);
 		assertEquals(0, 0);
-	
+
 		int i = 10;
 		Integer i2 = 10;
 		assertEquals(Integer.valueOf(i), i2);
 		assertTrue("bola".equalsIgnoreCase("BOla"));
 		assertTrue("bola".startsWith("bol"));
-	
+
 		Usuario u1 = umUsuario().agora();
 		Usuario u2 = umUsuario().agora();
 		Usuario u3 = null;
 		Usuario u4 = u1;
 		assertEquals(u1, u2);
-		
-		assertTrue(u3 == null);	
-		assertNull(u3);		
-		
-		//Se sao da mesma instancia
+
+		assertTrue(u3 == null);
+		assertNull(u3);
+
+		// Se sao da mesma instancia
 		assertSame(u1, u4);
-		
-		
+
 	}
 
 }
