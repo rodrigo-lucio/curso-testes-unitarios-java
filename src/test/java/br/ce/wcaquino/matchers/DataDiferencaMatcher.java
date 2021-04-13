@@ -1,5 +1,7 @@
 package br.ce.wcaquino.matchers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -18,10 +20,10 @@ public class DataDiferencaMatcher extends TypeSafeMatcher<Date> {
 	}
 
 	public void describeTo(Description description) {
-		Calendar data = Calendar.getInstance();
-		data.set(Calendar.DAY_OF_WEEK, diferencaDias);
-		String dataExtenso = data.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, new Locale("pt", "BR"));
-		description.appendText(dataExtenso);
+		Date dataEsperada = DataUtils.obterDataComDiferencaDias(diferencaDias);
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY");
+		description.appendText(dateFormat.format(dataEsperada));
+		System.out.println(description);
 	}
 
 	@Override
