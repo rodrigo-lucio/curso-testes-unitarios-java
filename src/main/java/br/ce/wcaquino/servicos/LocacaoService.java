@@ -57,8 +57,14 @@ public class LocacaoService {
 			}
 			valorLocacao += precoLocacaoFilme;
 		}
+		boolean negativado;
+		try {
+			negativado = spcService.possuiNegativacao(usuario);
+		} catch (Exception e) {
+			throw new LocadoraException("Problemas com o SPC, tente novamente");
+		}
 
-		if (spcService.possuiNegativacao(usuario)) {
+		if (negativado) {
 			throw new LocadoraException("Usuario negativado no SPC");
 		}
 
@@ -87,11 +93,10 @@ public class LocacaoService {
 	public void notificarAtrasos() {
 		List<Locacao> locacoes = dao.obterLocacoesPendentes();
 		for (Locacao locacao : locacoes) {
-			if(locacao.getDataRetorno().before(new Date())) {
-				emailService.notificarAtraso(locacao.getUsuario());				
+			if (locacao.getDataRetorno().before(new Date())) {
+				emailService.notificarAtraso(locacao.getUsuario());
 			}
 		}
 	}
-
 
 }
