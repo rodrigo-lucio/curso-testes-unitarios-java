@@ -30,7 +30,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import br.ce.wcaquino.dao.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
@@ -48,28 +51,23 @@ public class LocacaoServiceTest {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
+	@InjectMocks
 	private LocacaoService locacaoService;
 
 	// Deixado estatico pois o JUnit reinicializa todas as variaveis a cada teste
 	private static int contadorDeTestes = 0;
 
+	@Mock
 	private LocacaoDao dao;
+	@Mock
 	private SPCService spc;
+	@Mock
 	private EmailService email;
 
 	@Before
 	public void inicializarCenarios() {
-		System.out.println("Before");
-		locacaoService = new LocacaoService();
-		dao = new Mockito().mock(LocacaoDao.class);
-		locacaoService.setLocacaoDao(dao);
-		contadorDeTestes++;
+		MockitoAnnotations.initMocks(this);
 		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
-		spc = Mockito.mock(SPCService.class);
-		locacaoService.setSPCService(spc);
-		email = Mockito.mock(EmailService.class);
-		locacaoService.setEmailService(email);
-
 	}
 
 	@After
@@ -295,12 +293,9 @@ public class LocacaoServiceTest {
 		Usuario usuario = umUsuario().agora();
 		Usuario usuario2 = umUsuario().comNome("user 1").agora();
 		Usuario usuario3 = umUsuario().comNome("user 3").agora();
-		List<Locacao> locacoes = Arrays.asList(
-					umLocacao().atrasada().comUsuario(usuario).agora(),
-					umLocacao().comUsuario(usuario2).agora(),
-					umLocacao().atrasada().comUsuario(usuario3).agora(),
-					umLocacao().atrasada().comUsuario(usuario3).agora()
-					);
+		List<Locacao> locacoes = Arrays.asList(umLocacao().atrasada().comUsuario(usuario).agora(),
+				umLocacao().comUsuario(usuario2).agora(), umLocacao().atrasada().comUsuario(usuario3).agora(),
+				umLocacao().atrasada().comUsuario(usuario3).agora());
 
 		// Alterando o comportamento do mock, estamos ensinando ele
 		// Quando for chamado locacoes pendentes, retorne a lista de locacoes
@@ -310,26 +305,28 @@ public class LocacaoServiceTest {
 
 		// Verifica no mock, se o metodo notificar atrasos foi chamado para esse usuario
 		Mockito.verify(email).notificarAtraso(usuario);
-		
-		Mockito.verify(email, Mockito.times(2)).notificarAtraso(usuario3); 
+
+		Mockito.verify(email, Mockito.times(2)).notificarAtraso(usuario3);
 		// == Times = diz que o método foi chamado exatamente duas vezes para o usuario
-		//Poderiamos utilizar Mockito.atLeast(2) = Se foi chamado pelo menos duas vezes
-		//Ou Mockito.atMost(5) = No maximo 5
-		
-		
-		//Verifica se o metodo nunca foi chamado para o usuario, que nesse caso a locacao dele nao esta atrasada, logo ele nao recebeu o email
-		Mockito.verify(email, Mockito.never()).notificarAtraso(usuario2);   
-		
-		//Garante que mais nenhum email foi enviado fora os que foram informados acima
+		// Poderiamos utilizar Mockito.atLeast(2) = Se foi chamado pelo menos duas vezes
+		// Ou Mockito.atMost(5) = No maximo 5
+
+		// Verifica se o metodo nunca foi chamado para o usuario, que nesse caso a
+		// locacao dele nao esta atrasada, logo ele nao recebeu o email
+		Mockito.verify(email, Mockito.never()).notificarAtraso(usuario2);
+
+		// Garante que mais nenhum email foi enviado fora os que foram informados acima
 		Mockito.verifyNoMoreInteractions(email);
-		
-		//Caso queiramos garantir que o serviço de SPC não foi chamado nesse teste
-		//Mockito.verifyZeroInteractions(spc);
-		//Claro que fica comentado por não teria logica nesse teste, colocado aqui apenas para conhecimento
-		
-		//Aqui podemos verificar se o notificar atraso foi chamado pelo menos 3 vezes para qualquer usuario
+
+		// Caso queiramos garantir que o serviço de SPC não foi chamado nesse teste
+		// Mockito.verifyZeroInteractions(spc);
+		// Claro que fica comentado por não teria logica nesse teste, colocado aqui
+		// apenas para conhecimento
+
+		// Aqui podemos verificar se o notificar atraso foi chamado pelo menos 3 vezes
+		// para qualquer usuario
 		Mockito.verify(email, Mockito.times(3)).notificarAtraso(Mockito.any(Usuario.class));
-		//No caso, foi chamado uma vez para usuario e duas vezes para usuario3
+		// No caso, foi chamado uma vez para usuario e duas vezes para usuario3
 	}
 
 }
