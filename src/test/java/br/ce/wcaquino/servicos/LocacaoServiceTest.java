@@ -349,11 +349,11 @@ public class LocacaoServiceTest {
 		Locacao locacao = LocacaoBuilder.umLocacao().agora();
 		locacaoService.prorrogarLoacao(locacao, 3);
 		
-		//Captura Exatamente o que foi  
+		//Captura Exatamente o que foi modificado dentro de prorrogar locacao, e passado para o salvar la dentro
 		ArgumentCaptor<Locacao> argumentCaptor = ArgumentCaptor.forClass(Locacao.class);
 		Mockito.verify(dao).salvar(argumentCaptor.capture());
 		Locacao locacaoRetornada = argumentCaptor.getValue();
-		
+		System.out.println(locacaoRetornada.toString());
 		error.checkThat(locacaoRetornada.getValor(), is(12.0));
 		error.checkThat(locacaoRetornada.getDataLocacao(), isHoje());
 		error.checkThat(locacaoRetornada.getDataRetorno(), isHojeComDiferencaDias(3));

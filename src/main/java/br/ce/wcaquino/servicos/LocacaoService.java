@@ -107,6 +107,7 @@ public class LocacaoService {
 		novaLocacao.setDataRetorno(DataUtils.obterDataComDiferencaDias(dias));
 		novaLocacao.setValor(locacao.getValor() * dias);
 		dao.salvar(novaLocacao);
+		System.out.println("Dentro prorrogar " + novaLocacao.toString());
 	}
 
 }
