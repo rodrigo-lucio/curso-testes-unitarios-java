@@ -30,11 +30,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import br.ce.wcaquino.builder.LocacaoBuilder;
 import br.ce.wcaquino.dao.LocacaoDao;
@@ -45,6 +49,8 @@ import br.ce.wcaquino.exception.FilmeSemEstoqueException;
 import br.ce.wcaquino.exception.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({LocacaoService.class, DataUtils.class})
 public class LocacaoServiceTest {
 
 	@Rule
@@ -91,7 +97,10 @@ public class LocacaoServiceTest {
 	public void deveAlugarFilme() throws Exception {
 
 		// Executa o teste só quando não é sabado
-		Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+		//Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+		//Comentamos essa linha acima, agora utilizaremos o powermock
+		
+		PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(9, 4, 2021));
 
 		// Cenario
 		Usuario usuario = umUsuario().agora();
@@ -114,6 +123,7 @@ public class LocacaoServiceTest {
 		// error.checkThat(isMesmaData(locacao.getDataRetorno(),
 		// obterDataComDiferencaDias(1)), is(true));
 		// trocado a chamada acima pela de baixo porem agora com machers
+		
 		error.checkThat(locacao.getDataRetorno(), isHojeComDiferencaDias(1));
 
 		// Verificação
@@ -251,13 +261,25 @@ public class LocacaoServiceTest {
 	}
 
 	@Test
-	public void deveDevolverNaSegundaAoAlugarNoSabado() throws FilmeSemEstoqueException, LocadoraException {
+	public void deveDevolverNaSegundaAoAlugarNoSabado() throws Exception {
 		// Só executa o teste no sabado
-		Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+		// Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(),
+		// Calendar.SATURDAY));
+		// Comentamos por que agora vamos utilizar o powermock para a classe date
 
 		Usuario usuario = umUsuario().agora();
-		List<Filme> filmes = new ArrayList<Filme>();
-		filmes.add(umFilme().agora());
+		List<Filme> filmes = Arrays.asList(umFilme().agora());
+
+		// O que isso quer dizer: Quando chamar um New (construtor) - sem nenhum
+		// argumento (withNoArguments) entao retorne dia 10/04/2021
+		PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(10, 4, 2021));
+
+		// alem do mais, tivemos que adicionar esses decorators la em cima
+		/*
+		 * @RunWith(PowerMockRunner.class)
+		 * @PrepareForTest(LocacaoService.class)
+		 */
+
 		Locacao retorno = locacaoService.alugarFilme(usuario, filmes);
 
 		boolean isSegunda = DataUtils.verificarDiaSemana(retorno.getDataRetorno(), Calendar.MONDAY);
@@ -265,6 +287,9 @@ public class LocacaoServiceTest {
 
 		assertThat(retorno.getDataRetorno(), caiEm(Calendar.MONDAY));
 		assertThat(retorno.getDataRetorno(), caiNumaSegunda());
+		
+		//Verifica se o new Date() foi dado o new() duas vezes
+ 		PowerMockito.verifyNew(Date.class, Mockito.times(2)).withNoArguments();
 
 	}
 
@@ -348,8 +373,9 @@ public class LocacaoServiceTest {
 	public void deveProrrogarUmaLocacao() {
 		Locacao locacao = LocacaoBuilder.umLocacao().agora();
 		locacaoService.prorrogarLoacao(locacao, 3);
-		
-		//Captura Exatamente o que foi modificado dentro de prorrogar locacao, e passado para o salvar la dentro
+
+		// Captura Exatamente o que foi modificado dentro de prorrogar locacao, e
+		// passado para o salvar la dentro
 		ArgumentCaptor<Locacao> argumentCaptor = ArgumentCaptor.forClass(Locacao.class);
 		Mockito.verify(dao).salvar(argumentCaptor.capture());
 		Locacao locacaoRetornada = argumentCaptor.getValue();
@@ -357,7 +383,7 @@ public class LocacaoServiceTest {
 		error.checkThat(locacaoRetornada.getValor(), is(12.0));
 		error.checkThat(locacaoRetornada.getDataLocacao(), isHoje());
 		error.checkThat(locacaoRetornada.getDataRetorno(), isHojeComDiferencaDias(3));
-	
-	}	
+
+	}
 
 }
