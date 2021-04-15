@@ -36,6 +36,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.verification.Times;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -50,7 +51,7 @@ import br.ce.wcaquino.exception.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({LocacaoService.class, DataUtils.class})
+@PrepareForTest({ LocacaoService.class })
 public class LocacaoServiceTest {
 
 	@Rule
@@ -97,10 +98,18 @@ public class LocacaoServiceTest {
 	public void deveAlugarFilme() throws Exception {
 
 		// Executa o teste só quando não é sabado
-		//Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
-		//Comentamos essa linha acima, agora utilizaremos o powermock
-		
-		PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(9, 4, 2021));
+		// Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(),
+		// Calendar.SATURDAY));
+		// Comentamos essa linha acima, agora utilizaremos o powermock
+		// PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(9, 4, 2021));
+		// Agora utilizando com Calendar Static
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.DAY_OF_MONTH, 14);
+		calendar.set(Calendar.MONTH, Calendar.APRIL);
+		calendar.set(Calendar.YEAR, 2021);
+
+		PowerMockito.mockStatic(Calendar.class);
+		PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
 
 		// Cenario
 		Usuario usuario = umUsuario().agora();
@@ -123,7 +132,7 @@ public class LocacaoServiceTest {
 		// error.checkThat(isMesmaData(locacao.getDataRetorno(),
 		// obterDataComDiferencaDias(1)), is(true));
 		// trocado a chamada acima pela de baixo porem agora com machers
-		
+
 		error.checkThat(locacao.getDataRetorno(), isHojeComDiferencaDias(1));
 
 		// Verificação
@@ -272,25 +281,38 @@ public class LocacaoServiceTest {
 
 		// O que isso quer dizer: Quando chamar um New (construtor) - sem nenhum
 		// argumento (withNoArguments) entao retorne dia 10/04/2021
-		PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(10, 4, 2021));
-
+		// PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(10,
+		// 4, 2021));
 		// alem do mais, tivemos que adicionar esses decorators la em cima
 		/*
 		 * @RunWith(PowerMockRunner.class)
+		 * 
 		 * @PrepareForTest(LocacaoService.class)
 		 */
+		// ALTERAMOS Para Calendar o service de locacao
+		// Sendo assim, para estaticos faremos assim =>
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.DAY_OF_MONTH, 10);
+		calendar.set(Calendar.MONTH, Calendar.APRIL);
+		calendar.set(Calendar.YEAR, 2021);
+
+		PowerMockito.mockStatic(Calendar.class);
+		PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
 
 		Locacao retorno = locacaoService.alugarFilme(usuario, filmes);
-
+		System.out.println("Tetetetetet" + retorno.getDataRetorno());
 		boolean isSegunda = DataUtils.verificarDiaSemana(retorno.getDataRetorno(), Calendar.MONDAY);
 		assertTrue(isSegunda);
 
 		assertThat(retorno.getDataRetorno(), caiEm(Calendar.MONDAY));
 		assertThat(retorno.getDataRetorno(), caiNumaSegunda());
-		
-		//Verifica se o new Date() foi dado o new() duas vezes
- 		PowerMockito.verifyNew(Date.class, Mockito.times(2)).withNoArguments();
 
+		// Verifica se o new Date() foi dado o new() duas vezes
+		//Comentamos aqui pois comecamos a utilizar o Celandar estatico
+		//PowerMockito.verifyNew(Date.class, Mockito.times(2)).withNoArguments();
+		PowerMockito.verifyNoMoreInteractions(Calendar.class, Mockito.times(2));
+		
+		
 	}
 
 	@Test

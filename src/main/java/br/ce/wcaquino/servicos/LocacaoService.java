@@ -71,10 +71,12 @@ public class LocacaoService {
 		locacao.setFilmes(filmes);
 		locacao.setValor(valorLocacao);
 		locacao.setUsuario(usuario);
-		locacao.setDataLocacao(new Date());
+		//locacao.setDataLocacao(new Date()); Mudamos aqui para utilizar o Calendar - Sera utilizado o PowerMock para Classes estaticas
+		locacao.setDataLocacao(Calendar.getInstance().getTime());
 
 		// Entrega no dia seguinte
-		Date dataEntrega = new Date();
+		//Date dataEntrega = new Date(); Mudamos aqui para utilizar o Calendar - Sera utilizado o PowerMock para Classes estaticas
+		Date dataEntrega = Calendar.getInstance().getTime();
 		dataEntrega = adicionarDias(dataEntrega, 1);
 
 		// Nao aceita devolver no domingo
