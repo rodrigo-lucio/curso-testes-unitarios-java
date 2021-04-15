@@ -77,6 +77,7 @@ public class LocacaoServiceTest {
 	public void inicializarCenarios() {
 		MockitoAnnotations.initMocks(this);
 		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
+		locacaoService = PowerMockito.spy(locacaoService);
 	}
 
 	@After
@@ -101,7 +102,8 @@ public class LocacaoServiceTest {
 		// Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(),
 		// Calendar.SATURDAY));
 		// Comentamos essa linha acima, agora utilizaremos o powermock
-		// PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(9, 4, 2021));
+		// PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(9,
+		// 4, 2021));
 		// Agora utilizando com Calendar Static
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.DAY_OF_MONTH, 14);
@@ -308,11 +310,10 @@ public class LocacaoServiceTest {
 		assertThat(retorno.getDataRetorno(), caiNumaSegunda());
 
 		// Verifica se o new Date() foi dado o new() duas vezes
-		//Comentamos aqui pois comecamos a utilizar o Celandar estatico
-		//PowerMockito.verifyNew(Date.class, Mockito.times(2)).withNoArguments();
+		// Comentamos aqui pois comecamos a utilizar o Celandar estatico
+		// PowerMockito.verifyNew(Date.class, Mockito.times(2)).withNoArguments();
 		PowerMockito.verifyNoMoreInteractions(Calendar.class, Mockito.times(2));
-		
-		
+
 	}
 
 	@Test
@@ -406,6 +407,23 @@ public class LocacaoServiceTest {
 		error.checkThat(locacaoRetornada.getDataLocacao(), isHoje());
 		error.checkThat(locacaoRetornada.getDataRetorno(), isHojeComDiferencaDias(3));
 
+	}
+
+	@Test
+	public void deveAlugarFilmeSemCalcularValor() throws Exception {
+		Usuario usuario = umUsuario().agora();
+		List<Filme> filmes = Arrays.asList(umFilme().agora());
+		
+		//Mocando o metodo privado "calcularValorLocacao", nao queremos nos preocupar com isso nesse teste
+		//Entao estamos dizendo que queremos voltar o valor 1.0
+		//E o metodo original do service nao vai ser chamado
+		PowerMockito.doReturn(1.0).when(locacaoService, "calcularValorLocacao", filmes);
+
+		Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
+		
+		Assert.assertThat(locacao.getValor(), is(1.0));
+		
+		PowerMockito.verifyPrivate(locacaoService).invoke("calcularValorLocacao", filmes);
 	}
 
 }

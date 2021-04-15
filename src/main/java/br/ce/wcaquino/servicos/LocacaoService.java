@@ -32,31 +32,7 @@ public class LocacaoService {
 			throw new LocadoraException("Sem filmes");
 		}
 
-		double valorLocacao = 0;
-
-		for (int i = 0; i < filmes.size(); i++) {
-			if (filmes.get(i).getEstoque() == 0) {
-				throw new FilmeSemEstoqueException();
-			}
-
-			Double precoLocacaoFilme = filmes.get(i).getPrecoLocacao();
-
-			switch (i) {
-			case 2:
-				precoLocacaoFilme = (precoLocacaoFilme * 0.75);
-				break;
-			case 3:
-				precoLocacaoFilme = (precoLocacaoFilme * 0.5);
-				break;
-			case 4:
-				precoLocacaoFilme = (precoLocacaoFilme * 0.25);
-				break;
-			case 5:
-				precoLocacaoFilme = 0d;
-				break;
-			}
-			valorLocacao += precoLocacaoFilme;
-		}
+		double valorLocacao = calcularValorLocacao(filmes);
 		boolean negativado;
 		try {
 			negativado = spcService.possuiNegativacao(usuario);
@@ -90,6 +66,35 @@ public class LocacaoService {
 		dao.salvar(locacao);
 
 		return locacao;
+	}
+
+	private double calcularValorLocacao(List<Filme> filmes) throws FilmeSemEstoqueException {
+		System.out.println("Calculando o valor da locacao.....");
+		double valorLocacao = 0;
+		for (int i = 0; i < filmes.size(); i++) {
+			if (filmes.get(i).getEstoque() == 0) {
+				throw new FilmeSemEstoqueException();
+			}
+
+			Double precoLocacaoFilme = filmes.get(i).getPrecoLocacao();
+
+			switch (i) {
+			case 2:
+				precoLocacaoFilme = (precoLocacaoFilme * 0.75);
+				break;
+			case 3:
+				precoLocacaoFilme = (precoLocacaoFilme * 0.5);
+				break;
+			case 4:
+				precoLocacaoFilme = (precoLocacaoFilme * 0.25);
+				break;
+			case 5:
+				precoLocacaoFilme = 0d;
+				break;
+			}
+			valorLocacao += precoLocacaoFilme;
+		}
+		return valorLocacao;
 	}
 
 	public void notificarAtrasos() {
