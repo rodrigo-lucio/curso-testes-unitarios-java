@@ -47,12 +47,10 @@ public class LocacaoService {
 		locacao.setFilmes(filmes);
 		locacao.setValor(valorLocacao);
 		locacao.setUsuario(usuario);
-		//locacao.setDataLocacao(new Date()); Mudamos aqui para utilizar o Calendar - Sera utilizado o PowerMock para Classes estaticas
-		locacao.setDataLocacao(Calendar.getInstance().getTime());
+		locacao.setDataLocacao(obterData());
 
 		// Entrega no dia seguinte
-		//Date dataEntrega = new Date(); Mudamos aqui para utilizar o Calendar - Sera utilizado o PowerMock para Classes estaticas
-		Date dataEntrega = Calendar.getInstance().getTime();
+		Date dataEntrega = obterData();
 		dataEntrega = adicionarDias(dataEntrega, 1);
 
 		// Nao aceita devolver no domingo
@@ -66,6 +64,10 @@ public class LocacaoService {
 		dao.salvar(locacao);
 
 		return locacao;
+	}
+
+	protected Date obterData() {
+		return new Date();
 	}
 
 	private double calcularValorLocacao(List<Filme> filmes) throws FilmeSemEstoqueException {
@@ -100,7 +102,7 @@ public class LocacaoService {
 	public void notificarAtrasos() {
 		List<Locacao> locacoes = dao.obterLocacoesPendentes();
 		for (Locacao locacao : locacoes) {
-			if (locacao.getDataRetorno().before(new Date())) {
+			if (locacao.getDataRetorno().before(obterData())) {
 				emailService.notificarAtraso(locacao.getUsuario());
 			}
 		}

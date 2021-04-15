@@ -14,28 +14,32 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.internal.verification.Times;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 import br.ce.wcaquino.builder.LocacaoBuilder;
@@ -47,8 +51,9 @@ import br.ce.wcaquino.exception.FilmeSemEstoqueException;
 import br.ce.wcaquino.exception.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
 
-
-public class LocacaoServiceTest {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ LocacaoService.class })
+public class LocacaoServiceTestComPowerMock {
 
 	@Rule
 	public ErrorCollector error = new ErrorCollector();
@@ -56,7 +61,7 @@ public class LocacaoServiceTest {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
-	@InjectMocks @Spy
+	@InjectMocks
 	private LocacaoService locacaoService;
 
 	// Deixado estatico pois o JUnit reinicializa todas as variaveis a cada teste
@@ -73,6 +78,7 @@ public class LocacaoServiceTest {
 	public void inicializarCenarios() {
 		MockitoAnnotations.initMocks(this);
 		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
+		locacaoService = PowerMockito.spy(locacaoService);
 	}
 
 	@After
@@ -92,6 +98,22 @@ public class LocacaoServiceTest {
 
 	@Test
 	public void deveAlugarFilme() throws Exception {
+
+		// Executa o teste só quando não é sabado
+		// Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(),
+		// Calendar.SATURDAY));
+		// Comentamos essa linha acima, agora utilizaremos o powermock
+		// PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(9,
+		// 4, 2021));
+		// Agora utilizando com Calendar Static
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.DAY_OF_MONTH, 14);
+		calendar.set(Calendar.MONTH, Calendar.APRIL);
+		calendar.set(Calendar.YEAR, 2021);
+
+		PowerMockito.mockStatic(Calendar.class);
+		PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
+
 		// Cenario
 		Usuario usuario = umUsuario().agora();
 
@@ -99,8 +121,6 @@ public class LocacaoServiceTest {
 
 		// Ação
 		Locacao locacao = locacaoService.alugarFilme(usuario, Arrays.asList(filme));
-		//Refatorando para o Mockito - Retorne dia X quando for chamado obterData de locacaoService
-		Mockito.doReturn(DataUtils.obterData(14, 4, 2021)).when(locacaoService).obterData();
 
 		/*
 		 * Passamos a utilizar o ErrorCollector para retornar todas as falhas de uma vez
@@ -257,18 +277,44 @@ public class LocacaoServiceTest {
 		// Só executa o teste no sabado
 		// Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(),
 		// Calendar.SATURDAY));
-		// Comentamos por que agora vamos utilizar o mockito para a classe date
+		// Comentamos por que agora vamos utilizar o powermock para a classe date
 
 		Usuario usuario = umUsuario().agora();
 		List<Filme> filmes = Arrays.asList(umFilme().agora());
 
-		Mockito.doReturn(DataUtils.obterData(10, 4, 2021)).when(locacaoService).obterData();
+		// O que isso quer dizer: Quando chamar um New (construtor) - sem nenhum
+		// argumento (withNoArguments) entao retorne dia 10/04/2021
+		// PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(10,
+		// 4, 2021));
+		// alem do mais, tivemos que adicionar esses decorators la em cima
+		/*
+		 * @RunWith(PowerMockRunner.class)
+		 * 
+		 * @PrepareForTest(LocacaoService.class)
+		 */
+		// ALTERAMOS Para Calendar o service de locacao
+		// Sendo assim, para estaticos faremos assim =>
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.DAY_OF_MONTH, 10);
+		calendar.set(Calendar.MONTH, Calendar.APRIL);
+		calendar.set(Calendar.YEAR, 2021);
+
+		PowerMockito.mockStatic(Calendar.class);
+		PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
+
 		Locacao retorno = locacaoService.alugarFilme(usuario, filmes);
+		System.out.println("Tetetetetet" + retorno.getDataRetorno());
 		boolean isSegunda = DataUtils.verificarDiaSemana(retorno.getDataRetorno(), Calendar.MONDAY);
 		assertTrue(isSegunda);
 
 		assertThat(retorno.getDataRetorno(), caiEm(Calendar.MONDAY));
 		assertThat(retorno.getDataRetorno(), caiNumaSegunda());
+
+		// Verifica se o new Date() foi dado o new() duas vezes
+		// Comentamos aqui pois comecamos a utilizar o Celandar estatico
+		// PowerMockito.verifyNew(Date.class, Mockito.times(2)).withNoArguments();
+		PowerMockito.verifyNoMoreInteractions(Calendar.class, Mockito.times(2));
+
 	}
 
 	@Test
@@ -365,16 +411,28 @@ public class LocacaoServiceTest {
 	}
 
 	@Test
+	public void deveAlugarFilmeSemCalcularValor() throws Exception {
+		Usuario usuario = umUsuario().agora();
+		List<Filme> filmes = Arrays.asList(umFilme().agora());
+		
+		//Mocando o metodo privado "calcularValorLocacao", nao queremos nos preocupar com isso nesse teste
+		//Entao estamos dizendo que queremos voltar o valor 1.0, com o parametro filmes
+		PowerMockito.doReturn(1.0).when(locacaoService, "calcularValorLocacao", filmes);
+		//E o metodo original do service nao vai ser chamado
+		
+		Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
+		
+		Assert.assertThat(locacao.getValor(), is(1.0));
+		
+		//Verifica se o metodo privado foi invocado
+		PowerMockito.verifyPrivate(locacaoService).invoke("calcularValorLocacao", filmes);
+	}
+
+	@Test
 	public void deveCalcularValorLocacao() throws Exception {
-		//Executar de fato os metodos privados diretamente 
-		List<Filme> filmes = Arrays.asList(umFilme().agora());	
-		
-		//Acessa o metodo privado com o reflections do java
-		Class<LocacaoService> classe = LocacaoService.class;
-		Method metodo = classe.getDeclaredMethod("calcularValorLocacao", List.class);
-		metodo.setAccessible(true);
-		Double valor = (Double) metodo.invoke(locacaoService, filmes);
+		//Executar de fato os metodos privados diretamente com o Whitebox
+		List<Filme> filmes = Arrays.asList(umFilme().agora());		
+		Double valor = (Double) Whitebox.invokeMethod(locacaoService, "calcularValorLocacao", filmes);
 		Assert.assertThat(valor, is(4.0));
-		
 	}
 }
