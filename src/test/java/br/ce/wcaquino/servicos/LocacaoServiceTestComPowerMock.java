@@ -79,6 +79,8 @@ public class LocacaoServiceTestComPowerMock {
 		MockitoAnnotations.initMocks(this);
 		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
 		locacaoService = PowerMockito.spy(locacaoService);
+		System.out.println("Iniciando 4");
+		CalculadoraTest.ordem.append("4");
 	}
 
 	@After
@@ -91,9 +93,16 @@ public class LocacaoServiceTestComPowerMock {
 		System.out.println("antesDeInstanciarClasses");
 	}
 
+
+
+	@After
+	public void finalizando() {
+		System.out.println("finalizando 3");
+	}
+
 	@AfterClass
-	public static void depoisDaClasseSerDestruida() {
-		System.out.println("depoisDaClasseSerDestruida");
+	public static void depoisDeExecutarAClasse() {
+		System.out.println(CalculadoraTest.ordem.toString());
 	}
 
 	@Test
@@ -414,24 +423,25 @@ public class LocacaoServiceTestComPowerMock {
 	public void deveAlugarFilmeSemCalcularValor() throws Exception {
 		Usuario usuario = umUsuario().agora();
 		List<Filme> filmes = Arrays.asList(umFilme().agora());
-		
-		//Mocando o metodo privado "calcularValorLocacao", nao queremos nos preocupar com isso nesse teste
-		//Entao estamos dizendo que queremos voltar o valor 1.0, com o parametro filmes
+
+		// Mocando o metodo privado "calcularValorLocacao", nao queremos nos preocupar
+		// com isso nesse teste
+		// Entao estamos dizendo que queremos voltar o valor 1.0, com o parametro filmes
 		PowerMockito.doReturn(1.0).when(locacaoService, "calcularValorLocacao", filmes);
-		//E o metodo original do service nao vai ser chamado
-		
+		// E o metodo original do service nao vai ser chamado
+
 		Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
-		
+
 		Assert.assertThat(locacao.getValor(), is(1.0));
-		
-		//Verifica se o metodo privado foi invocado
+
+		// Verifica se o metodo privado foi invocado
 		PowerMockito.verifyPrivate(locacaoService).invoke("calcularValorLocacao", filmes);
 	}
 
 	@Test
 	public void deveCalcularValorLocacao() throws Exception {
-		//Executar de fato os metodos privados diretamente com o Whitebox
-		List<Filme> filmes = Arrays.asList(umFilme().agora());		
+		// Executar de fato os metodos privados diretamente com o Whitebox
+		List<Filme> filmes = Arrays.asList(umFilme().agora());
 		Double valor = (Double) Whitebox.invokeMethod(locacaoService, "calcularValorLocacao", filmes);
 		Assert.assertThat(valor, is(4.0));
 	}

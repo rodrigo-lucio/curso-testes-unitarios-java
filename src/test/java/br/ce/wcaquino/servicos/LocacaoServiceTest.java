@@ -49,7 +49,7 @@ import br.ce.wcaquino.exception.LocadoraException;
 import br.ce.wcaquino.runner.ParallelRunner;
 import br.ce.wcaquino.utils.DataUtils;
 
-@RunWith(ParallelRunner.class) // Rodando com a nossa classe de execução paralela
+//@RunWith(ParallelRunner.class) // Rodando com a nossa classe de execução paralela -- Comentado pois comecamos a utilizar o surfire
 public class LocacaoServiceTest {
 
 	@Rule
@@ -75,6 +75,7 @@ public class LocacaoServiceTest {
 	public void inicializarCenarios() {
 		MockitoAnnotations.initMocks(this);
 		System.out.println(String.format("Iniciando teste numeri %s", contadorDeTestes));
+		CalculadoraTest.ordem.append("2");
 	}
 
 	@After
@@ -90,6 +91,7 @@ public class LocacaoServiceTest {
 	@AfterClass
 	public static void depoisDaClasseSerDestruida() {
 		System.out.println("depoisDaClasseSerDestruida");
+		System.out.println(CalculadoraTest.ordem.toString());
 	}
 
 	@Test
