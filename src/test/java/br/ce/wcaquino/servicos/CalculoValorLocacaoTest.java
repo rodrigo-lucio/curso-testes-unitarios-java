@@ -95,7 +95,6 @@ public class CalculoValorLocacaoTest {
 		Usuario usuario = umUsuario().agora();
 		Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
 		assertThat(locacao.getValor(), is(valorLocacao));
-
 	}
 
 	@Test

@@ -32,7 +32,6 @@ public class ParallelRunner extends BlockJUnit4ClassRunner{
 			try {
 				this.executorService.awaitTermination(10,TimeUnit.MINUTES);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}

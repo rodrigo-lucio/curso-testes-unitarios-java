@@ -93,8 +93,6 @@ public class LocacaoServiceTestComPowerMock {
 		System.out.println("antesDeInstanciarClasses");
 	}
 
-
-
 	@After
 	public void finalizando() {
 		System.out.println("finalizando 3");
